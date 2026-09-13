@@ -67,19 +67,21 @@ Dependency edges (`link --depends-on`) are separate from traceability links (`ch
 
 ### Entity roles
 
-**Project** — durable container with scope, boundaries, and optional capabilities. Projects do not reach `done` status.
+**Project** — durable container with scope, boundaries, and optional capabilities. Status is `pending`, `in_progress`, or `obsolete`. Projects do not reach `done`. `obsolete` retires the product and keeps the tree.
 
 **Milestone** — coarse ordering. Status flows `pending` → `in_progress` → `done`.
 
-**Change** — substantial round of work with a clear deliverable. Small fixes and repo maintenance should not create changes. Carries a goal, deliverables, and optional document refs to external markdown.
+**Change** — substantial round of work with a clear deliverable. Small fixes and repo maintenance should not create changes. Carries a goal, deliverables, and optional document refs to external markdown. Status is `pending` → `in_progress` → `done`. Unfinished dependencies block the move to `in_progress`. Blocked is a read projection, not a stored status.
 
-**Fact** — durable project memory: rationale, constraints, and non-obvious intentional behavior. Not an architecture decision record, not a task. Facts may supersede earlier facts.
+**Fact** — durable project memory: rationale, constraints, and non-obvious intentional behavior. Not an architecture decision record, not a task. Status is `active` or `superseded`. Facts may supersede earlier facts. A fact with no successor is deleted.
 
-**Validation** — authored invariant with lifecycle and optional repo coverage claims. Outcomes live in the repo.
+**Validation** — authored invariant with lifecycle and optional repo coverage claims. Outcomes live in the repo. Status is `active` or `superseded`, same machine as Fact.
 
-**Task** — project-owned deferred work. May trace to a change. Smaller than a Change. Default here when durability is unclear.
+**Task** — project-owned deferred work. Smaller than a Change. Default here when durability is unclear. Status is triage: `open`, `done`, `wontfix`, or `converted`. A task is usually absorbed by a Change through `change_id` and later marked `done`. It converts 1:1 only when the leftover grows into a Change or a Project.
 
-**Bug** and **Idea** — broken behavior and future direction. With **Task**, these are triage buckets.
+**Bug** — broken behavior. Same triage statuses as Task. Usually absorbed by a Change through a change link, then `done`. Rarely converts 1:1.
+
+**Idea** — future direction. Same triage statuses. Convert is the normal promotion: `converted_to_code` points at a Change or a Project.
 
 **DocumentRef** — typed pointer to a document in an external store (`vision`, `architecture`, `adr`, and consumer-defined types). The donor dropped the first-class ADR entity. Decision prose stays in the external store; PSG holds the ref and status metadata.
 
@@ -312,7 +314,7 @@ Create a new repository for Product State Graph. Treat `packages/anneal` as the 
 
 Fix a layer when the seam is wrong. If the CLI imports sqlite directly, replace it with API calls.
 
-Keep behavior unless a locked decision says otherwise. Locked: state graph role, Fact and Task taxonomy, no ADR entity, API-only client path, FastAPI, msgspec domain + Pydantic wire models, four workspace packages, thin API handlers with all business rules in domain, GraphRepository persistence port, domain-owned state machine, workspace tenancy from MVP.
+Keep behavior unless a locked decision says otherwise. Locked: state graph role, Fact and Task taxonomy, no ADR entity, Fact and Validation `active`/`superseded` only (no `obsolete` on that enum), `wontfix` kept, blocked as a read projection not a status, convert as 1:1 promotion vs `change_id` absorption, API-only client path, FastAPI, msgspec domain + Pydantic wire models, four workspace packages, thin API handlers with all business rules in domain, GraphRepository persistence port, domain-owned state machine, workspace tenancy from MVP.
 
 Run the canonical gate (`prek run --all-files`) before you merge each piece. That gate is the minimum quality loop: formatting, lint, types, tests, and module boundaries. Add a complexity-plus-coverage gate for agent-written code (CRAP or an equivalent) so cleanliness is mechanical, not review-by-diff.
 
@@ -324,7 +326,7 @@ See [Donor feature inventory](donor-feature-inventory.md) for the full list with
 
 **Keep:** entity system (rename Knowledge → Fact, Followup → Task), ChangeKind, dependency graph, traceability links, milestones, document refs, hierarchical codes and recode, `context` / `view` / `search` / `log`, CRUD commands, state machine and transition guards, FTS search, mutation log, bundled skills (`/psg`, implement, plan, init), sqlite and postgres adapters.
 
-**Discard:** change `sequence`, milestone composition, `upload`, `view-set`, vector search stub and `embedding_id` columns, leftover `adr/markdown.py`, legacy migration hooks, `OPERATING-CONTRACT.md`, donor naming (`anneal` → `psg`), per-repo database hosting, CLI in-process domain access, raw `sqlite3.Connection` as the persistence interface. Do not resurrect removed donor entities (ADR, ValidationRun, deliverable entity, and so on). Cut these in the first PR of the new repo — see How you rebuild it step 1.
+**Discard:** change `sequence`, milestone composition, `upload`, `view-set`, vector search stub and `embedding_id` columns, leftover `adr/markdown.py`, legacy migration hooks, `OPERATING-CONTRACT.md`, donor naming (`anneal` → `psg`), per-repo database hosting, CLI in-process domain access, raw `sqlite3.Connection` as the persistence interface, `obsolete` on Fact and Validation. Do not resurrect removed donor entities (ADR, ValidationRun, deliverable entity, and so on). Cut these in the first PR of the new repo — see How you rebuild it step 1.
 
 **Defer:** MCP (V1 if not MVP), multi-user membership polish (V1).
 
