@@ -8,7 +8,8 @@ Implementation reference lives in the [agentic-engineering](https://github.com/z
 
 ## Documentation
 
-- [Project seed](docs/anneal/SEED.md) — product scope, architecture, rebuild plan
+- [Project seed](docs/SEED.md) — product scope and rebuild plan
+- [System architecture](docs/ARCHITECTURE.md) — components, persistence, and stack
 - [Donor feature inventory](docs/anneal/donor-feature-inventory.md) — keep / discard / defer from `packages/anneal`
 - [DEVELOPING.md](DEVELOPING.md) — tooling and workflow
 - [AGENTS.md](AGENTS.md) — AI coding agent guidance
@@ -31,12 +32,12 @@ prek run --all-files
 ```
 psg/
 ├── packages/              # workspace members (psg-domain, psg-persistence, psg-api, psg-cli)
-├── docs/anneal/           # seed and donor inventory
+├── docs/                  # SEED, ARCHITECTURE; anneal/ holds donor inventory
 ├── pyproject.toml         # workspace root
 └── DEVELOPING.md
 ```
 
-Planned workspace packages: `psg-domain`, `psg-persistence`, `psg-api`, `psg-cli`. See [SEED.md](docs/anneal/SEED.md).
+Planned workspace packages: `psg-domain`, `psg-persistence`, `psg-api`, `psg-cli`. See [ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## License
 

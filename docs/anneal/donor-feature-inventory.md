@@ -4,6 +4,8 @@ Status: **reference**. Feature list from `packages/anneal` for PSG rebuild decis
 
 Donor path: [`packages/anneal`](https://github.com/zsoltcs1123/agentic-engineering/tree/main/packages/anneal) in [agentic-engineering](https://github.com/zsoltcs1123/agentic-engineering)
 
+Related: [Project seed](../SEED.md), [Architecture](../ARCHITECTURE.md).
+
 ---
 
 ## Core model
@@ -18,8 +20,9 @@ Donor path: [`packages/anneal`](https://github.com/zsoltcs1123/agentic-engineeri
 | **Validation** | Authored invariants and optional repo coverage claims | keep |
 | **Bug** / **Idea** | Triage buckets | keep |
 | **ChangeKind** | `new_feature`, `feature_update`, `cross_cutting`, `refactor` | keep |
-| **ProjectLifecycle** | `planned`, `live`, `obsolete` | keep |
+| **ProjectStatus** | `pending`, `in_progress`, `obsolete` (donor **ProjectLifecycle**: `planned`, `live`, `obsolete`) | keep (rename enum and first two values) |
 | **WorkflowStatus** | `pending` → `in_progress` → `done` | keep |
+| **LifecycleStatus** | `active` → `superseded` | keep (drop donor `obsolete` on Fact and Validation) |
 | **TriageStatus** | `open`, `done`, `wontfix`, `converted` | keep |
 | **BugSeverity** | `low`, `medium`, `high`, `critical` | keep |
 
@@ -29,13 +32,13 @@ Donor path: [`packages/anneal`](https://github.com/zsoltcs1123/agentic-engineeri
 
 | Feature | What it does | Decision |
 | --- | --- | --- |
-| **`depends-on` edges** | Execution ordering and blocked guard | keep |
-| **Bug → change** traceability | `bug_change` table | keep |
-| **Followup/validation → change** | `change_id` FK | keep |
-| **Supersession** | `superseded_by` on knowledge/validation | keep (Fact supersession) |
-| **Convert** | `converted_to_code` on bug/idea/followup | keep |
+| **`depends-on` edges** | Execution ordering and blocked guard | keep (blocked is a guard plus a later read projection, not a status) |
+| **Bug → change** traceability | `bug_change` table | keep (absorption: Bug is part of a Change) |
+| **Followup/validation → change** | `change_id` FK | keep (Task and Validation absorption) |
+| **Supersession** | `superseded_by` on knowledge/validation | keep (Fact and Validation. No `obsolete` on this enum) |
+| **Convert** | `converted_to_code` on bug/idea/followup | keep (1:1 promotion to a Change or a Project. Default path for Idea. Rare for Task and Bug) |
 | **Milestone scheduling** | Schedule change, followup, bug into milestone | keep |
-| **Milestone completion guard** | Block milestone `done` if scheduled items open | keep |
+| **Milestone completion guard** | Block milestone `done` if scheduled items open | keep (PSG extends donor: scheduled **changes** and **ideas** gate `done` too, not only tasks and bugs) |
 | **Milestone composition** | Nested milestones (DB only, no CLI) | discard |
 | **Change `sequence` field** | Manual ordering within project | discard |
 | **Topological change ordering** | View layer over deps | keep |
@@ -175,7 +178,7 @@ Donor path: [`packages/anneal`](https://github.com/zsoltcs1123/agentic-engineeri
 | HTTP API as sole client path | keep (MVP) |
 | `psg serve` | keep (MVP) |
 | Multi-project per workspace | keep (MVP) |
-| Postgres adapter | keep (MVP or V1 — see SEED) |
+| Postgres adapter | keep (MVP or V1 — see [Project seed](../SEED.md)) |
 | MCP | defer (V1 if not MVP) |
 | Multi-user membership polish | defer (V1) |
 
@@ -185,7 +188,7 @@ Donor path: [`packages/anneal`](https://github.com/zsoltcs1123/agentic-engineeri
 
 **Keep:** entity system (Fact and Task rename), ChangeKind, deps and traceability, milestones and scheduling, doc refs, codes and recode, context/view/search/log, CRUD CLI (as API client), state machine and guards, FTS, mutation log, skills bundle, sqlite and postgres adapters, HTTP API, `psg serve`, multi-project per workspace.
 
-**Discard:** `upload`, `view-set`, change `sequence`, milestone composition, embedding stub, legacy migration baggage, narrative export hooks, `OPERATING-CONTRACT.md`, donor naming (`anneal` → `psg`), per-repo DB hosting, CLI in-process domain access.
+**Discard:** `upload`, `view-set`, change `sequence`, milestone composition, embedding stub, legacy migration baggage, narrative export hooks, `OPERATING-CONTRACT.md`, donor naming (`anneal` → `psg`), per-repo DB hosting, CLI in-process domain access, `obsolete` on Fact and Validation.
 
 **Maybe:** `export`, `edit`, `row_version`, rich renderer, `housekeep` skill bundling.
 
