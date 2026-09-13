@@ -1,0 +1,65 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "psg"
+version = "0.1.0"
+description = "SQL state graph for agent-facing delivery: typed entities, deps, workflow status, and refs to external docs."
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = []
+
+[tool.uv.workspace]
+members = ["packages/*"]
+
+# [tool.uv.sources]
+# psg-domain = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.1",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.14.6",
+    "mypy>=1.18.2",
+    "commitizen>=4.10.0",
+    "prek>=0.3.5",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/psg"]
+
+[tool.coverage.run]
+source = ["src", "packages"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__pycache__/*",
+    "*/.*/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.1.0"
+version_files = [
+    "pyproject.toml:version",
+    "src/psg/__init__.py:__version__",
+]
+update_changelog_on_bump = true
+changelog_file = "CHANGELOG.md"
+changelog_incremental = true
+major_version_zero = true
+bump_message = "bump: version $current_version → $new_version"
+tag_format = "v$version"
+annotated_tag = false

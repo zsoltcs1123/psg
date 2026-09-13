@@ -1,0 +1,36 @@
+---
+globs: *.py
+alwaysApply: false
+---
+
+# Python Development Standards
+
+Python version: [3.14](https://docs.python.org/3/whatsnew/3.14.html). When uncertain about 3.14 features, check the official docs.
+
+## Style
+
+- **Type hints on everything** - All function parameters, return types, and variables with non-obvious types
+- **Absolute imports only** - Never use relative imports
+- **No docstrings** unless it's a public API or explicitly requested. Typer command callbacks count as public API: their docstring is what Typer renders as `--help` text for that command, so keeping a one-line docstring there is allowed and preferred over duplicating into `help=`.
+- **No comments** - Prefer self-documenting code through clear naming and structure
+- **Functional over OO** - Prefer functions over classes when appropriate
+
+## Design
+
+- **SRP** - Each module has one responsibility. When a module serves multiple consumers for different reasons, extract the shared concern into its own module.
+- **No cross-module private imports** - Never import `_`-prefixed functions from another module. If you need it, make it public or extract it to a shared module.
+- **Dataclasses for data models** - Prefer `@dataclass` over regular classes
+- **Data models in separate files** - Do not mix data models with services/functions
+- **RERO** - Receive an object, return an object; avoid primitive obsession for domain concepts
+- **Pure functions** - Avoid side effects where possible
+- **SLAP** - Each function should operate at a single level of abstraction
+- **YAGNI** - Don't add functionality until it's actually needed
+- **Composition over inheritance**
+- **Explicit error handling** - Use proper exception types, not bare `except`
+- **Stepdown Rule** - Apply the stepdown rule for organizing file/module contents
+- **Simplicity** - Avoid overengineering
+
+## Module Size
+
+- No single source file exceeds **500 lines**. When a module grows past this, decompose it into a package with focused sub-modules.
+- Test files may exceed this limit when tests are inherently verbose, but prefer splitting by concern.
