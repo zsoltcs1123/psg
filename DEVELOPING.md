@@ -62,6 +62,12 @@ Config: `pyproject.toml` → `[tool.commitizen]`.
 | `.editorconfig`            | Editor formatting consistency                |
 | `.secrets.baseline`        | Secret detection false positives             |
 
+## Complexity budget
+
+Ruff enforces McCabe cyclomatic complexity per function via rule `C901`. Threshold: `ruff.toml` → `[lint.mccabe]` → `max-complexity` (default `10`). Runs with `ruff check` and the prek ruff hook — no extra tool or hook.
+
+When a function exceeds the limit, split it into smaller helpers rather than raising the threshold. Pair with the `module-size` hook (500 lines per file) in `.pre-commit-config.yaml`.
+
 ## CI and dependency updates
 
 GitHub Actions runs `uv run --frozen prek run --all-files` on push and pull requests to `main` / `master`. No automerge. No Codecov (needs a separate account).

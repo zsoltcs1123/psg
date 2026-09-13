@@ -23,6 +23,7 @@ select = [
     "C4",  # flake8-comprehensions
     "SIM", # flake8-simplify
     "TID252", # ban relative imports
+    "C901", # McCabe complexity
 ]
 ignore = [
     "D100", # Missing docstring in public module
@@ -33,6 +34,9 @@ ignore = [
     "D105", # Missing docstring in magic method
     "D107", # Missing docstring in __init__
 ]
+
+[lint.mccabe]
+max-complexity = 10
 
 [lint.pydocstyle]
 convention = "google"
