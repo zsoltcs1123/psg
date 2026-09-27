@@ -27,9 +27,12 @@ from psg_domain.entities import (
 )
 from psg_domain.errors import (
     BlockedByDependencyError,
+    InvalidCloseStatusError,
+    InvalidConversionTargetError,
     InvalidTransitionError,
     MilestoneIncompleteError,
 )
+from psg_domain.triage import close, convert, link_change
 from psg_domain.workflow import (
     assert_dependencies_clear,
     assert_milestone_completeable,
@@ -51,6 +54,8 @@ __all__ = [
     "FactCode",
     "Idea",
     "IdeaCode",
+    "InvalidCloseStatusError",
+    "InvalidConversionTargetError",
     "InvalidTransitionError",
     "LifecycleStatus",
     "Milestone",
@@ -67,5 +72,8 @@ __all__ = [
     "WorkflowStatus",
     "assert_dependencies_clear",
     "assert_milestone_completeable",
+    "close",
+    "convert",
+    "link_change",
     "transition",
 ]
