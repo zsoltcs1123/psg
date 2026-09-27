@@ -4,9 +4,10 @@ from psg_domain.entities import (
     BugSeverity,
     Change,
     ChangeCode,
-    ChangeKind,
+    ChangeType,
     DependencyTarget,
     DocumentRef,
+    Entity,
     Fact,
     FactCode,
     Idea,
@@ -17,13 +18,11 @@ from psg_domain.entities import (
     Project,
     ProjectCode,
     ProjectStatus,
-    StatusOwning,
     Task,
     TaskCode,
     TriageStatus,
     Validation,
     ValidationCode,
-    ValidationScenario,
     WorkflowStatus,
 )
 from psg_domain.errors import (
@@ -31,7 +30,11 @@ from psg_domain.errors import (
     InvalidTransitionError,
     MilestoneIncompleteError,
 )
-from psg_domain.workflow import transition
+from psg_domain.workflow import (
+    assert_dependencies_clear,
+    assert_milestone_completeable,
+    transition,
+)
 
 __all__ = [
     "BlockedByDependencyError",
@@ -40,9 +43,10 @@ __all__ = [
     "BugSeverity",
     "Change",
     "ChangeCode",
-    "ChangeKind",
+    "ChangeType",
     "DependencyTarget",
     "DocumentRef",
+    "Entity",
     "Fact",
     "FactCode",
     "Idea",
@@ -55,13 +59,13 @@ __all__ = [
     "Project",
     "ProjectCode",
     "ProjectStatus",
-    "StatusOwning",
     "Task",
     "TaskCode",
     "TriageStatus",
     "Validation",
     "ValidationCode",
-    "ValidationScenario",
     "WorkflowStatus",
+    "assert_dependencies_clear",
+    "assert_milestone_completeable",
     "transition",
 ]

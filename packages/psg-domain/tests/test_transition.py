@@ -1,13 +1,14 @@
 import pytest
+
 from psg_domain.entities import (
     Change,
-    ChangeKind,
+    ChangeType,
+    Entity,
     Fact,
     LifecycleStatus,
     Milestone,
     Project,
     ProjectStatus,
-    StatusOwning,
     Task,
     TriageStatus,
     WorkflowStatus,
@@ -28,9 +29,13 @@ _WS = 1
         (ProjectStatus.pending, ProjectStatus.obsolete),
         (ProjectStatus.in_progress, ProjectStatus.obsolete),
         (LifecycleStatus.active, LifecycleStatus.superseded),
-        (TriageStatus.open, TriageStatus.done),
-        (TriageStatus.open, TriageStatus.wontfix),
-        (TriageStatus.open, TriageStatus.converted),
+        (TriageStatus.pending, TriageStatus.in_progress),
+        (TriageStatus.pending, TriageStatus.done),
+        (TriageStatus.pending, TriageStatus.wontfix),
+        (TriageStatus.pending, TriageStatus.converted),
+        (TriageStatus.in_progress, TriageStatus.done),
+        (TriageStatus.in_progress, TriageStatus.wontfix),
+        (TriageStatus.in_progress, TriageStatus.converted),
     ],
 )
 def test_legal_transition(current: StatusValue, requested: StatusValue) -> None:
@@ -61,6 +66,7 @@ def test_triage_terminal_stays_terminal(terminal: TriageStatus) -> None:
         (WorkflowStatus.pending, WorkflowStatus.done),
         (WorkflowStatus.in_progress, WorkflowStatus.pending),
         (ProjectStatus.in_progress, ProjectStatus.pending),
+        (TriageStatus.in_progress, TriageStatus.pending),
     ],
 )
 def test_skipped_or_reverse_transition_rejected(
@@ -79,7 +85,7 @@ def test_skipped_or_reverse_transition_rejected(
     [
         (WorkflowStatus.done, WorkflowStatus.pending),
         (ProjectStatus.obsolete, ProjectStatus.pending),
-        (TriageStatus.converted, TriageStatus.open),
+        (TriageStatus.converted, TriageStatus.pending),
     ],
 )
 def test_terminal_to_anything_rejected(current: StatusValue, requested: StatusValue) -> None:
@@ -93,7 +99,7 @@ def test_wrong_status_family_has_empty_allowed() -> None:
     change = Change(
         workspace_id=_WS,
         code="app-C1",
-        kind=ChangeKind.new_feature,
+        type=ChangeType.new_feature,
         status=WorkflowStatus.pending,
     )
     with pytest.raises(InvalidTransitionError) as exc_info:
@@ -122,12 +128,12 @@ def test_invalid_transition_error_fields_on_illegal_step() -> None:
     assert err.allowed == ["obsolete"]
 
 
-def _entity_for_status(status: StatusValue) -> StatusOwning:
+def _entity_for_status(status: StatusValue) -> Entity:
     if isinstance(status, WorkflowStatus):
         return Change(
             workspace_id=_WS,
             code="app-C1",
-            kind=ChangeKind.new_feature,
+            type=ChangeType.new_feature,
             status=status,
         )
     if isinstance(status, ProjectStatus):

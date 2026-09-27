@@ -7,17 +7,10 @@ ProjectCode = Annotated[str, Meta(pattern=r"^[A-Za-z0-9_-]+$")]
 MilestoneCode = Annotated[str, Meta(pattern=r"^[A-Za-z0-9_-]+-MS\d+$")]
 ChangeCode = Annotated[str, Meta(pattern=r"^[A-Za-z0-9_-]+-C\d+$")]
 FactCode = Annotated[str, Meta(pattern=r"^[A-Za-z0-9_-]+-F\d+$")]
-TaskCode = Annotated[str, Meta(pattern=r"^[A-Za-z0-9_-]+-T\d+$")]
 ValidationCode = Annotated[str, Meta(pattern=r"^[A-Za-z0-9_-]+-V\d+$")]
+TaskCode = Annotated[str, Meta(pattern=r"^[A-Za-z0-9_-]+-T\d+$")]
 BugCode = Annotated[str, Meta(pattern=r"^[A-Za-z0-9_-]+-B\d+$")]
 IdeaCode = Annotated[str, Meta(pattern=r"^[A-Za-z0-9_-]+-I\d+$")]
-
-
-class ChangeKind(StrEnum):
-    new_feature = "new_feature"
-    feature_update = "feature_update"
-    cross_cutting = "cross_cutting"
-    refactor = "refactor"
 
 
 class WorkflowStatus(StrEnum):
@@ -38,10 +31,18 @@ class LifecycleStatus(StrEnum):
 
 
 class TriageStatus(StrEnum):
-    open = "open"
+    pending = "pending"
+    in_progress = "in_progress"
     done = "done"
     wontfix = "wontfix"
     converted = "converted"
+
+
+class ChangeType(StrEnum):
+    new_feature = "new_feature"
+    feature_update = "feature_update"
+    cross_cutting = "cross_cutting"
+    refactor = "refactor"
 
 
 class BugSeverity(StrEnum):
@@ -49,10 +50,6 @@ class BugSeverity(StrEnum):
     medium = "medium"
     high = "high"
     critical = "critical"
-
-
-class ValidationScenario(Struct, kw_only=True):
-    description: str
 
 
 class Project(Struct, kw_only=True):
@@ -73,7 +70,7 @@ class Change(Struct, kw_only=True):
     id: int = 0
     workspace_id: int
     code: ChangeCode
-    kind: ChangeKind
+    type: ChangeType
     status: WorkflowStatus = WorkflowStatus.pending
 
 
@@ -85,32 +82,32 @@ class Fact(Struct, kw_only=True):
     superseded_by: int | None = None
 
 
-class Task(Struct, kw_only=True):
-    id: int = 0
-    workspace_id: int
-    code: TaskCode
-    status: TriageStatus = TriageStatus.open
-    change_id: int | None = None
-    milestone_id: int | None = None
-    converted_to_code: str = ""
-
-
 class Validation(Struct, kw_only=True):
     id: int = 0
     workspace_id: int
     code: ValidationCode
     status: LifecycleStatus = LifecycleStatus.active
-    scenarios: list[ValidationScenario] = []
+    scenarios: list[str] = []
     coverage: list[str] = []
     change_id: int | None = None
     superseded_by: int | None = None
+
+
+class Task(Struct, kw_only=True):
+    id: int = 0
+    workspace_id: int
+    code: TaskCode
+    status: TriageStatus = TriageStatus.pending
+    change_id: int | None = None
+    milestone_id: int | None = None
+    converted_to_code: str = ""
 
 
 class Bug(Struct, kw_only=True):
     id: int = 0
     workspace_id: int
     code: BugCode
-    status: TriageStatus = TriageStatus.open
+    status: TriageStatus = TriageStatus.pending
     severity: BugSeverity = BugSeverity.medium
     change_id: int | None = None
     milestone_id: int | None = None
@@ -121,7 +118,7 @@ class Idea(Struct, kw_only=True):
     id: int = 0
     workspace_id: int
     code: IdeaCode
-    status: TriageStatus = TriageStatus.open
+    status: TriageStatus = TriageStatus.pending
     milestone_id: int | None = None
     converted_to_code: str = ""
 
@@ -133,5 +130,5 @@ class DocumentRef(Struct, kw_only=True):
     change_id: int | None = None
 
 
-StatusOwning = Project | Milestone | Change | Fact | Task | Validation | Bug | Idea
-DependencyTarget = StatusOwning
+Entity = Project | Milestone | Change | Fact | Validation | Task | Bug | Idea
+DependencyTarget = Entity

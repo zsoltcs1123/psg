@@ -1,9 +1,10 @@
 import pytest
+
 from psg_domain.entities import (
     Bug,
     BugSeverity,
     Change,
-    ChangeKind,
+    ChangeType,
     DocumentRef,
     Fact,
     Idea,
@@ -14,7 +15,6 @@ from psg_domain.entities import (
     Task,
     TriageStatus,
     Validation,
-    ValidationScenario,
     WorkflowStatus,
 )
 
@@ -34,7 +34,7 @@ def test_milestone_defaults() -> None:
 
 @pytest.mark.unit
 def test_change_defaults() -> None:
-    change = Change(workspace_id=1, code="myapp-C1", kind=ChangeKind.new_feature)
+    change = Change(workspace_id=1, code="myapp-C1", type=ChangeType.new_feature)
     assert change.status is WorkflowStatus.pending
 
 
@@ -48,7 +48,7 @@ def test_fact_defaults() -> None:
 @pytest.mark.unit
 def test_task_defaults() -> None:
     task = Task(workspace_id=1, code="myapp-T1")
-    assert task.status is TriageStatus.open
+    assert task.status is TriageStatus.pending
     assert task.change_id is None
     assert task.milestone_id is None
     assert task.converted_to_code == ""
@@ -65,21 +65,15 @@ def test_validation_defaults() -> None:
 @pytest.mark.unit
 def test_bug_defaults() -> None:
     bug = Bug(workspace_id=1, code="myapp-B1")
-    assert bug.status is TriageStatus.open
+    assert bug.status is TriageStatus.pending
     assert bug.severity is BugSeverity.medium
 
 
 @pytest.mark.unit
 def test_idea_defaults() -> None:
     idea = Idea(workspace_id=1, code="myapp-I1")
-    assert idea.status is TriageStatus.open
+    assert idea.status is TriageStatus.pending
     assert idea.converted_to_code == ""
-
-
-@pytest.mark.unit
-def test_validation_scenario() -> None:
-    scenario = ValidationScenario(description="smoke path")
-    assert scenario.description == "smoke path"
 
 
 @pytest.mark.unit

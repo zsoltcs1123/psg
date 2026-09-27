@@ -6,11 +6,11 @@ from psg_domain.entities import (
     Bug,
     Change,
     DependencyTarget,
+    Entity,
     Idea,
     LifecycleStatus,
     Milestone,
     ProjectStatus,
-    StatusOwning,
     Task,
     TriageStatus,
     WorkflowStatus,
@@ -39,7 +39,13 @@ VALID_LIFECYCLE_TRANSITIONS: dict[LifecycleStatus, list[LifecycleStatus]] = {
 }
 
 VALID_TRIAGE_TRANSITIONS: dict[TriageStatus, list[TriageStatus]] = {
-    TriageStatus.open: [
+    TriageStatus.pending: [
+        TriageStatus.in_progress,
+        TriageStatus.done,
+        TriageStatus.wontfix,
+        TriageStatus.converted,
+    ],
+    TriageStatus.in_progress: [
         TriageStatus.done,
         TriageStatus.wontfix,
         TriageStatus.converted,
@@ -70,7 +76,7 @@ def _allowed_transitions(current: StatusValue) -> Sequence[StatusValue]:
     return VALID_TRIAGE_TRANSITIONS[current]
 
 
-def transition[E: StatusOwning](entity: E, new_status: StatusValue) -> E:
+def transition[E: Entity](entity: E, new_status: StatusValue) -> E:
     current = entity.status
     if type(new_status) is not type(current):
         raise InvalidTransitionError(

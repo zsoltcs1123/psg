@@ -48,4 +48,4 @@ skip-magic-trailing-comma = false
 line-ending = "lf"
 
 [lint.isort]
-known-first-party = ["psg"]
+known-first-party = ["psg", "psg_domain"]

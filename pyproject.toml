@@ -51,6 +51,14 @@ exclude_lines = [
     "@abstractmethod",
 ]
 
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+extraPaths = [
+    "src",
+    "packages/psg-domain/src",
+]
+
 [tool.commitizen]
 name = "cz_conventional_commits"
 version = "0.1.0"
