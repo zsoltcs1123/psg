@@ -1,3 +1,4 @@
+from psg_domain.context import ContextBundle, assemble_context
 from psg_domain.entities import (
     Bug,
     BugCode,
@@ -40,6 +41,8 @@ from psg_domain.workflow import (
 )
 
 __all__ = [
+    "ContextBundle",
+    "assemble_context",
     "BlockedByDependencyError",
     "Bug",
     "BugCode",
