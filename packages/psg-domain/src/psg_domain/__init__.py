@@ -26,8 +26,15 @@ from psg_domain.entities import (
     ValidationScenario,
     WorkflowStatus,
 )
+from psg_domain.errors import (
+    BlockedByDependencyError,
+    InvalidTransitionError,
+    MilestoneIncompleteError,
+)
+from psg_domain.workflow import transition
 
 __all__ = [
+    "BlockedByDependencyError",
     "Bug",
     "BugCode",
     "BugSeverity",
@@ -40,9 +47,11 @@ __all__ = [
     "FactCode",
     "Idea",
     "IdeaCode",
+    "InvalidTransitionError",
     "LifecycleStatus",
     "Milestone",
     "MilestoneCode",
+    "MilestoneIncompleteError",
     "Project",
     "ProjectCode",
     "ProjectStatus",
@@ -54,4 +63,5 @@ __all__ = [
     "ValidationCode",
     "ValidationScenario",
     "WorkflowStatus",
+    "transition",
 ]
