@@ -40,12 +40,12 @@ repos:
       # Architectural import-boundary enforcement. Disabled by default: a fresh
       # project has no architecture to constrain yet. Add an `.importlinter`
       # contract and `import-linter` dev dependency, then uncomment to enable.
-      # - id: import-linter
-      #   name: import-linter
-      #   entry: uv run lint-imports
-      #   language: system
-      #   pass_filenames: false
-      #   always_run: true
+      - id: import-linter
+        name: import-linter
+        entry: uv run lint-imports
+        language: system
+        pass_filenames: false
+        always_run: true
 
       - id: module-size
         name: module-size (500 lines)

@@ -1,0 +1,13 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "psg-domain"
+version = "0.1.0"
+description = "Product state graph domain entities and workflow rules."
+requires-python = ">=3.14"
+dependencies = ["msgspec>=0.18"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/psg_domain"]

@@ -101,7 +101,7 @@ ValidationCode = Annotated[str, Meta(pattern=r"^[A-Za-z0-9_-]+-V\d+$")]
 BugCode = Annotated[str, Meta(pattern=r"^[A-Za-z0-9_-]+-B\d+$")]
 IdeaCode = Annotated[str, Meta(pattern=r"^[A-Za-z0-9_-]+-I\d+$")]
 
-class ChangeKind(StrEnum):
+class ChangeType(StrEnum):
     new_feature = "new_feature"
     feature_update = "feature_update"
     cross_cutting = "cross_cutting"
@@ -110,16 +110,13 @@ class ChangeKind(StrEnum):
 class WorkflowStatus(StrEnum): ...       # pending, in_progress, done
 class ProjectStatus(StrEnum): ...     # pending, in_progress, obsolete
 class LifecycleStatus(StrEnum): ...      # active, superseded  (no obsolete)
-class TriageStatus(StrEnum): ...         # open, done, wontfix, converted
+class TriageStatus(StrEnum): ...         # pending, in_progress, done, wontfix, converted
 
 class BugSeverity(StrEnum):
     low = "low"
     medium = "medium"
     high = "high"
     critical = "critical"
-
-class ValidationScenario(Struct, kw_only=True):
-    description: str
 
 class Project(Struct, kw_only=True):
     id: int = 0
@@ -138,7 +135,7 @@ class Change(Struct, kw_only=True):
     id: int = 0
     workspace_id: int
     code: ChangeCode
-    kind: ChangeKind                       # required, no default
+    type: ChangeType                       # required, no default
     status: WorkflowStatus = WorkflowStatus.pending
     # no sequence field
 
@@ -153,7 +150,7 @@ class Task(Struct, kw_only=True):
     id: int = 0
     workspace_id: int
     code: TaskCode
-    status: TriageStatus = TriageStatus.open
+    status: TriageStatus = TriageStatus.pending
     change_id: int | None = None
     milestone_id: int | None = None
     converted_to_code: str = ""
@@ -163,7 +160,7 @@ class Validation(Struct, kw_only=True):
     workspace_id: int
     code: ValidationCode
     status: LifecycleStatus = LifecycleStatus.active
-    scenarios: list[ValidationScenario] = []
+    scenarios: list[str] = []
     coverage: list[str] = []
     change_id: int | None = None
     superseded_by: int | None = None
@@ -172,7 +169,7 @@ class Bug(Struct, kw_only=True):
     id: int = 0
     workspace_id: int
     code: BugCode
-    status: TriageStatus = TriageStatus.open
+    status: TriageStatus = TriageStatus.pending
     severity: BugSeverity = BugSeverity.medium
     change_id: int | None = None
     milestone_id: int | None = None
@@ -182,7 +179,7 @@ class Idea(Struct, kw_only=True):
     id: int = 0
     workspace_id: int
     code: IdeaCode
-    status: TriageStatus = TriageStatus.open
+    status: TriageStatus = TriageStatus.pending
     milestone_id: int | None = None
     converted_to_code: str = ""
 
@@ -193,8 +190,8 @@ class DocumentRef(Struct, kw_only=True):
     change_id: int | None = None
     # no status, no workspace_id in architecture table — match architecture doc
 
-StatusOwning = Project | Milestone | Change | Fact | Task | Validation | Bug | Idea
-DependencyTarget = StatusOwning          # guard inspects .status on each target
+Entity = Project | Milestone | Change | Fact | Task | Validation | Bug | Idea
+DependencyTarget = Entity                # guard inspects .status on each target
 ```
 
 ### `errors.py`
@@ -225,7 +222,7 @@ _RESOLVED_TRIAGE: frozenset[TriageStatus]  # done, wontfix, converted — shared
 
 StatusValue = WorkflowStatus | ProjectStatus | LifecycleStatus | TriageStatus
 
-def transition[E: StatusOwning](entity: E, new_status: StatusValue) -> E: ...
+def transition[E: Entity](entity: E, new_status: StatusValue) -> E: ...
 
 def assert_dependencies_clear(targets: Sequence[DependencyTarget]) -> None: ...
 
@@ -318,7 +315,7 @@ Three slices. Each ends with `uv run pytest packages/psg-domain -m unit` green. 
 - Per-family cleared sets: at least Project (`in_progress`), Change (`done`), and Task (`wontfix`); LifecycleStatus never blocks; uncleared statuses block with sorted `blocking_codes`
 - Thin Milestone `in_progress` path (empty deps pass)
 - Milestone with all scheduled changes, tasks, bugs, and ideas terminal passes
-- `pending` or `in_progress` change, or `open` task, bug, or idea blocks with `MilestoneIncompleteError(milestone_code, blocking_codes)`; codes sorted
+- `pending` or `in_progress` change, or `pending` or `in_progress` task, bug, or idea blocks with `MilestoneIncompleteError(milestone_code, blocking_codes)`; codes sorted
 
 **Observable.** `uv run lint-imports` passes; prek import-linter hook enabled; full unit suite green.
 

@@ -23,5 +23,14 @@
     "**/__pycache__": true,
     "**/*.pyc": true
   },
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}/src",
+    "${workspaceFolder}/packages/psg-domain/src"
+  ],
+  "cursorpyright.analysis.extraPaths": [
+    "${workspaceFolder}/src",
+    "${workspaceFolder}/packages/psg-domain/src"
+  ],
   "cursorpyright.analysis.typeCheckingMode": "basic"
 }

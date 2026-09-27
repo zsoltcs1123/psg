@@ -1,0 +1,20 @@
+[importlinter]
+root_package = psg_domain
+include_external_packages = true
+
+[importlinter:contract:domain-isolation]
+name = Domain package must not import outer layers
+type = forbidden
+source_modules =
+    psg_domain
+forbidden_modules =
+    psg
+    psg_persistence
+    psg_api
+    psg_cli
+    fastapi
+    typer
+    pydantic
+    httpx
+    sqlalchemy
+    aiosqlite

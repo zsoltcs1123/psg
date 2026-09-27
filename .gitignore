@@ -187,3 +187,4 @@ credentials.json
 *.backup
 
 .artifacts
+.anneal/runs/

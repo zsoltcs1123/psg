@@ -83,11 +83,11 @@ Dependency edges (`link --depends-on`) are separate from traceability links (`ch
 
 **Validation** — authored invariant with lifecycle and optional repo coverage claims. Outcomes live in the repo. Status is `active` or `superseded`, same machine as Fact.
 
-**Task** — project-owned deferred work. Smaller than a Change. Default here when durability is unclear. Status is triage: `open`, `done`, `wontfix`, or `converted`. A task is usually absorbed by a Change through `change_id` and later marked `done`. It converts 1:1 only when the leftover grows into a Change or a Project.
+**Task** — project-owned deferred work. Smaller than a Change. Default here when durability is unclear. Status is triage: `pending`, `in_progress`, `done`, `wontfix`, or `converted`. `pending` may go straight to `done`. A task worked directly may pass through `in_progress`. A task is usually absorbed by a Change through `change_id` and stays `pending` until that work closes it. It converts 1:1 only when the leftover grows into a Change or a Project.
 
-**Bug** — broken behavior. Same triage statuses as Task. Usually absorbed by a Change through a change link, then `done`. Rarely converts 1:1.
+**Bug** — broken behavior. Same triage statuses as Task. A bug fixed directly may be `in_progress`. Usually absorbed by a Change through a change link, then `done`. Rarely converts 1:1.
 
-**Idea** — future direction. Same triage statuses. Convert is the normal promotion: `converted_to_code` points at a Change or a Project.
+**Idea** — future direction. Same triage statuses. `in_progress` means the idea is being shaped. Convert is the normal promotion: `converted_to_code` points at a Change or a Project.
 
 **DocumentRef** — typed pointer to a document in an external store (`vision`, `architecture`, `adr`, and consumer-defined types). The donor dropped the first-class ADR entity. Decision prose stays in the external store; PSG holds the ref and status metadata.
 
@@ -172,7 +172,7 @@ A blank-page rewrite is a risk. The donor has working CLI commands, migrations, 
 
 See [Donor feature inventory](anneal/donor-feature-inventory.md) for the full list with maybe items.
 
-**Keep:** entity system (rename Knowledge → Fact, Followup → Task), ChangeKind, dependency graph, traceability links, milestones, document refs, hierarchical codes and recode, `context` / `view` / `search` / `log`, CRUD commands, state machine and transition guards, FTS search, mutation log, bundled skills (`/psg`, implement, plan, init), sqlite and postgres adapters.
+**Keep:** entity system (rename Knowledge → Fact, Followup → Task, ChangeKind → ChangeType), dependency graph, traceability links, milestones, document refs, hierarchical codes and recode, `context` / `view` / `search` / `log`, CRUD commands, state machine and transition guards, FTS search, mutation log, bundled skills (`/psg`, implement, plan, init), sqlite and postgres adapters.
 
 **Discard:** change `sequence`, milestone composition, `upload`, `view-set`, vector search stub and `embedding_id` columns, leftover `adr/markdown.py`, legacy migration hooks, `OPERATING-CONTRACT.md`, donor naming (`anneal` → `psg`), per-repo database hosting, CLI in-process domain access, raw `sqlite3.Connection` as the persistence interface, `obsolete` on Fact and Validation. Do not resurrect removed donor entities (ADR, ValidationRun, deliverable entity, and so on). Cut these in the first PR of the new repo — see How you rebuild it step 1.
 
