@@ -17,3 +17,14 @@ class MilestoneIncompleteError(Exception):
         self.milestone_code = milestone_code
         self.blocking_codes = blocking_codes
         super().__init__(f"milestone {milestone_code} incomplete: {', '.join(blocking_codes)}")
+
+
+class InvalidCloseStatusError(Exception):
+    def __init__(self, status: str) -> None:
+        self.status = status
+        super().__init__(f"invalid close status: {status}")
+
+
+class InvalidConversionTargetError(Exception):
+    def __init__(self) -> None:
+        super().__init__("invalid conversion target")
